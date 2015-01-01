@@ -35,6 +35,8 @@ public class TestBase {
 
     private static int tdhsPort;
 
+    private static String dbname;
+
     private static String host;
 
     @BeforeClass
@@ -48,6 +50,7 @@ public class TestBase {
 
                 mysqlPort = Integer.parseInt(global.getProperty("mysql.port"));
                 tdhsPort = Integer.parseInt(global.getProperty("server.port"));
+                dbname = global.getProperty("db.name");
                 host = global.getProperty("server.host");
             } finally {
                 if (is != null) {
@@ -59,16 +62,16 @@ public class TestBase {
 
     public static Connection getMySQLConnection() throws SQLException,
             java.lang.ClassNotFoundException {
-        String url = "jdbc:mysql://" + host + ":" + mysqlPort + "/jdbc_test";
+        String url = "jdbc:mysql://" + host + ":" + mysqlPort + "/"+dbname;
         Class.forName("com.mysql.jdbc.Driver");
-        String userName = "test";
-        String password = "test";
+        String userName = "root";
+        String password = "root";
         return DriverManager.getConnection(url, userName, password);
     }
 
     public static Connection getTDHSConnection() throws SQLException,
             java.lang.ClassNotFoundException {
-        String url = "jdbc:tdhs://" + host + ":" + tdhsPort + "/jdbc_test";
+        String url = "jdbc:tdhs://" + host + ":" + tdhsPort + "/"+dbname;
         Class.forName("com.taobao.tdhs.jdbc.Driver");
         return DriverManager.getConnection(url, null, null);
     }

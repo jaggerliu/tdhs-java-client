@@ -24,8 +24,10 @@ import com.taobao.tdhs.client.response.TDHSResultSet;
 import com.taobao.tdhs.client.statement.BatchStatement;
 import com.taobao.tdhs.jdbc.exception.TDHSSQLException;
 import com.taobao.tdhs.jdbc.sqlparser.*;
+import com.taobao.tdhs.jdbc.sqlparser.SQLType;
 import com.taobao.tdhs.jdbc.util.ConvertUtil;
 import com.taobao.tdhs.jdbc.util.StringUtil;
+
 import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
