@@ -28,7 +28,6 @@ import java.util.List;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicLong;
 
-
 public class HSTravelRecordSelectJob implements Runnable {
 	private final HandlerSocket hs;
 	private final long minId;
@@ -38,13 +37,16 @@ public class HSTravelRecordSelectJob implements Runnable {
 	private final AtomicLong failedCount;
 	Random random = new Random();
 	private final String db;
+	private final boolean debug ;
 
 	// private volatile long usedTime;
 	// private volatile long success;
 
-	public HSTravelRecordSelectJob(HandlerSocket hs, String db, long minId, long maxId, int executeTimes,
-			AtomicLong finshiedCount, AtomicLong failedCount) {
+	public HSTravelRecordSelectJob(HandlerSocket hs, String db, long minId,
+			long maxId, int executeTimes, AtomicLong finshiedCount,
+			AtomicLong failedCount,boolean debug) {
 		super();
+		this.debug = debug;
 		this.db = db;
 		this.hs = hs;
 		this.minId = minId;
@@ -54,75 +56,80 @@ public class HSTravelRecordSelectJob implements Runnable {
 		this.failedCount = failedCount;
 	}
 
-
 	private void select() {
-		
 
-		String idValue = ((Math.abs(random.nextLong()) % (maxId - minId)) + minId)+"";
-		try{
-			hs.command().openIndex("id", db, "travelrecord", "PRIMARY", "id,user_id,traveldate,fee,days");
-
-			hs.command().find("id", new String[]{idValue});
-			List<HandlerSocketResult> results = hs.execute();
-
-			for(HandlerSocketResult result : results){
-				System.out.println("\t" + result.toString());
-			}
-	
-		} catch (IOException e) {
-			e.printStackTrace();
-		}finally{
-		}
-		
-//		ResultSet rs = null;
-//		Connection conn = null;
-//		PreparedStatement ps = null;
+		String idValue = ((Math.abs(random.nextLong()) % (maxId - minId)) + minId)
+				+ "";
 		try {
 
-//			conn = conPool.getConnection();
-//			 String sql = "select id,user_id,traveldate,fee,days from  travelrecord  where id="
-//			 + ((Math.abs(random.nextLong()) % (maxId - minId)) + minId);
-//			 ps = conn.prepareStatement(sql);
-//			 rs = ps.executeQuery(sql);
-			
-//			  TDHSResponse r = client.get(db, "travelrecord", "id", new String[] { "name" },
-//	    				new String[][] { { "aaa" } }, FindFlag.TDHS_EQ, 0, 100,
-//	    				new Filter[] { f });
-//			  TDHSResponse response = client.query().use(db).from("travelrecord")
-//	                   .select("id", "user_id", "traveldate", "fee", "days")
-//	                   .where().fields("id").equal(idValue).get();
+			hs.command().find("1", new String[] { idValue });
+			List<HandlerSocketResult> results = hs.execute();
 
-//			String sql = "select * from  travelrecord  where id=?";
-//			ps = conn.prepareStatement(sql);
-//			ps.setLong(1, (Math.abs(random.nextLong()) % (maxId - minId)) + minId);
-//			rs = ps.executeQuery();
-			
+			if ( debug ) {
+				for (HandlerSocketResult result : results) {
+					System.out.println("\t" + result.toString());
+				}
+
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+		}
+
+		// ResultSet rs = null;
+		// Connection conn = null;
+		// PreparedStatement ps = null;
+		try {
+
+			// conn = conPool.getConnection();
+			// String sql =
+			// "select id,user_id,traveldate,fee,days from  travelrecord  where id="
+			// + ((Math.abs(random.nextLong()) % (maxId - minId)) + minId);
+			// ps = conn.prepareStatement(sql);
+			// rs = ps.executeQuery(sql);
+
+			// TDHSResponse r = client.get(db, "travelrecord", "id", new
+			// String[] { "name" },
+			// new String[][] { { "aaa" } }, FindFlag.TDHS_EQ, 0, 100,
+			// new Filter[] { f });
+			// TDHSResponse response =
+			// client.query().use(db).from("travelrecord")
+			// .select("id", "user_id", "traveldate", "fee", "days")
+			// .where().fields("id").equal(idValue).get();
+
+			// String sql = "select * from  travelrecord  where id=?";
+			// ps = conn.prepareStatement(sql);
+			// ps.setLong(1, (Math.abs(random.nextLong()) % (maxId - minId)) +
+			// minId);
+			// rs = ps.executeQuery();
+
 			finshiedCount.incrementAndGet();
 			// success++;
 		} catch (Exception e) {
 			failedCount.incrementAndGet();
 			e.printStackTrace();
 		} finally {
-//			try {
-//				if (ps != null)
-//					ps.close();
-//				if (rs != null)
-//					rs.close();
-//				conPool.returnCon(conn);
-//			} catch (SQLException e) {
-//			}
+			// try {
+			// if (ps != null)
+			// ps.close();
+			// if (rs != null)
+			// rs.close();
+			// conPool.returnCon(conn);
+			// } catch (SQLException e) {
+			// }
 		}
 	}
 
 	public void run() {
-		// long start = System.currentTimeMillis();
-		for (int i = 0; i < executeTimes; i++) {
-			this.select();
-			// usedTime = System.currentTimeMillis() - start;
-		}
-		
-
 		try {
+			// long start = System.currentTimeMillis();
+			hs.command().openIndex("1", db, "travelrecord", "PRIMARY",
+					"id,user_id,traveldate,fee,days");
+			for (int i = 0; i < executeTimes; i++) {
+				this.select();
+				// usedTime = System.currentTimeMillis() - start;
+			}
+
 			hs.close();
 		} catch (IOException e) {
 			e.printStackTrace();

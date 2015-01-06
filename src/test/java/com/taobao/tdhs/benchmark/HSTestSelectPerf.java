@@ -51,7 +51,7 @@ public class HSTestSelectPerf {
 	}
 
 	private  void doTest(String url, String user, String password, int threadCount,
-			long minId, long maxId, int executetimes, final boolean outmidle) {
+			long minId, long maxId, int executetimes, final boolean debug) {
 		executor = Executors.newFixedThreadPool(threadCount);
 		String host = url.split(":")[0];
 		String port = url.split(":")[1];
@@ -63,7 +63,7 @@ public class HSTestSelectPerf {
 				HandlerSocket hs = new HandlerSocket();
 				hs.open(host, Integer.parseInt(port));
 				HSTravelRecordSelectJob job = new HSTravelRecordSelectJob(hs,db, minId, maxId,
-						executetimes, finshiedCount, failedCount);
+						executetimes, finshiedCount, failedCount,debug);
 				executor.execute(job);
 			} catch (Exception e) {
 				System.out.println("failed create thread " + i + " err " + e.toString());
@@ -83,7 +83,7 @@ public class HSTestSelectPerf {
 		Class.forName("com.mysql.jdbc.Driver");
 		if (args.length < 5) {
 			System.out
-					.println("input param,format: [jdbcurl] [user] [password]  [threadpoolsize]  [executetimes] [minId-maxId] [repeat]");
+					.println("input param,format: [jdbcurl] [user] [password]  [threadpoolsize]  [executetimes] [minId-maxId] [debug]");
 			return;
 		}
 		int threadCount = 0;// 线程数
@@ -97,18 +97,12 @@ public class HSTestSelectPerf {
 		System.out.println("concerent threads:" + threadCount);
 		System.out.println("execute sql times:" + executetimes);
 		System.out.println("maxId:" + maxId);
-		int repeate = 1;
-		if (args.length > 6) {
-			repeate = Integer.parseInt(args[6]);
-			System.out.println("repeat test times:" + repeate);
-		}
-//		for (int i = 0; i < repeate; i++) {
+		boolean debug = Boolean.parseBoolean(args[6]);
 			try {
-				new HSTestSelectPerf().doTest(url, user, password, threadCount, minId, maxId, executetimes, repeate < 2);
+				new HSTestSelectPerf().doTest(url, user, password, threadCount, minId, maxId, executetimes, debug);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-//		}
 
 	}
 
